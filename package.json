@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node index.js",
     "dev": "nodemon server.js",
     "prod": "node server.js"
   },
