@@ -1,55 +1,51 @@
-const fs = require('fs').promises;
-const { v4: uuid } = require('uuid');
-
 const { catchAsync } = require('../utils');
+const User = require('../models/userModel');
 
 exports.createUser = catchAsync(async (req, res) => {
-  const { name, year } = req.body;
-  const dataFromDB = await fs.readFile('./models/moduls.json');
-  const users = JSON.parse(dataFromDB);
-  const newUser = {
-    id: uuid(),
+  const { name, email, password, birthyear, role } = req.body;
+
+  const newUser = await User.create({
     name,
-    year,
-  };
-  users.push(newUser);
-  await fs.writeFile('./models/moduls.json', JSON.stringify(users));
-  return res.status(201).json({ user: newUser });
+    email,
+    password,
+    birthyear,
+    role,
+  });
+
+  res.status(201).json({ newUser });
 });
 
 exports.getUsers = catchAsync(async (req, res) => {
-  const users = JSON.parse(await fs.readFile('./models/moduls.json'));
-  return res.status(200).json({ users });
+  const users = await User.find().sort({ name: 1 }).lean();
+  console.log(users);
+  res.status(200).json({ users });
 });
 
 exports.getUserById = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const users = JSON.parse(await fs.readFile('./models/moduls.json'));
-  const userById = users.find((el) => el.id === id);
+  const userById = await User.findById(id).select('+password');
+  userById.password = undefined; // password не передається у відповіді, ялее до цього моменту, його можна обробляти
   return res.send({ userById });
 });
 
 exports.updateUserById = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const { name, year } = req.body;
-  const users = JSON.parse(await fs.readFile('./models/moduls.json'));
-  const userById = users.find((el) => el.id === id);
-  if (name) userById.name = name;
-  if (year) userById.year = year;
+  const { name, birthyear } = req.body;
 
-  const userByIdIdx = users.findIndex((el) => el.id === id);
-  users[userByIdIdx] = userById;
-  await fs.writeFile('./models/moduls.json', JSON.stringify(users));
-  res.status(200).json({ userById });
+  const updatedUser = await User.findByIdAndUpdate(
+    id,
+    {
+      name,
+      birthyear,
+    },
+    { new: true }
+  ).select('name birthyear');
+
+  res.status(200).json({ updatedUser });
 });
 
 exports.deleteUserById = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const users = JSON.parse(await fs.readFile('./models/moduls.json'));
-  const updateUsers = users.filter((el) => el.id !== id);
-  await fs.writeFile(
-    './models/moduls.json',
-    JSON.stringify(updateUsers)
-  );
+  await User.findByIdAndDelete(id);
   res.sendStatus(204);
 });

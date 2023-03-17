@@ -16,3 +16,5 @@
 2.  Сustom errors
 3.  morgan
 4.  catch async errors - wrapper function
+5.  MongoDB
+6.  mongoose

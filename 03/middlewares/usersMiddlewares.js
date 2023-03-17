@@ -1,29 +1,38 @@
-const fs = require('fs').promises;
+const {
+  Types: { ObjectId },
+} = require('mongoose');
+const User = require('../models/userModel');
 
 const { AppError, catchAsync, validators } = require('../utils');
 
-exports.checkUserData = (req, res, next) => {
+exports.checkUserData = catchAsync(async (req, res, next) => {
   const { error, value } = validators.createUserValidator(req.body);
 
   if (error) return next(new AppError(400, error.details[0].message));
 
+  const { email } = value;
+
+  const userExists = await User.exists({ email });
+
+  if (userExists)
+    return next(
+      new AppError(409, 'User with this email already exists...')
+    );
   req.body = value;
 
   next();
-};
+});
 
 exports.checkUserId = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-
-  if (id.length < 10) {
+  if (!ObjectId.isValid(id)) {
     // додаємо статус та текст помилці, передаємо далі
     return next(new AppError(400, 'Invalid user id...'));
   }
 
-  const users = JSON.parse(await fs.readFile('./models/moduls.json'));
-  const userById = users.find((el) => el.id === id);
+  const userExists = await User.exists({ _id: id });
 
-  if (userById) return next();
-
-  return next(new AppError(404, 'User this id does not exist...'));
+  if (!userExists)
+    return next(new AppError(409, 'User not found...'));
+  next();
 });
