@@ -18,3 +18,7 @@
 4.  catch async errors - wrapper function
 5.  MongoDB
 6.  mongoose
+
+04
+
+1. bcrypt
