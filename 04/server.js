@@ -8,6 +8,7 @@ dotenv.config({ path: './.env' });
 
 const authRrouter = require('./routes/authRoutes');
 const userRouter = require('./routes/userRoutes');
+const todoRouter = require('./routes/todoRoutes');
 
 const app = express();
 
@@ -24,6 +25,7 @@ app.use(express.json());
 
 app.use('/api/v1/auth', authRrouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/todos', todoRouter);
 
 app.all('*', (req, res) => {
   res.status(404).json({

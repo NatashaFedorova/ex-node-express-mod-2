@@ -1,6 +1,12 @@
 const { catchAsync } = require('../utils');
 const User = require('../models/userModel');
 
+exports.getMe = (req, res) => {
+  res.status(200).json({
+    user: req.user,
+  });
+};
+
 exports.createUser = catchAsync(async (req, res) => {
   const { name, email, password, birthyear, role } = req.body;
 
@@ -12,7 +18,7 @@ exports.createUser = catchAsync(async (req, res) => {
     role,
   });
 
-  res.status(201).json({ newUser });
+  res.status(201).json({ user: newUser });
 });
 
 exports.getUsers = catchAsync(async (req, res) => {
@@ -24,7 +30,7 @@ exports.getUserById = catchAsync(async (req, res) => {
   const { id } = req.params;
   const userById = await User.findById(id).select('+password');
   userById.password = undefined; // password не передається у відповіді, ялее до цього моменту, його можна обробляти
-  return res.send({ userById });
+  return res.send({ user: userById });
 });
 
 exports.updateUserById = catchAsync(async (req, res) => {
@@ -40,7 +46,7 @@ exports.updateUserById = catchAsync(async (req, res) => {
     { new: true }
   ).select('name birthyear');
 
-  res.status(200).json({ updatedUser });
+  res.status(200).json({ user: updatedUser });
 });
 
 exports.deleteUserById = catchAsync(async (req, res) => {

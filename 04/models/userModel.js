@@ -34,15 +34,19 @@ const userSchema = new Schema(
   }
 );
 
-userSchema.pre('save', async function (next) {
+// isModified - метод mongoose ,який перевіряє чи змінюється певне поле
+userSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) return next();
+
   const salt = await bcrypt.genSalt(10);
+
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
 
+// кастомний метод перевіряє чи валідний пароль ввів user
 // async не потрібно
-userSchema.methods.checkPassword = (candidate, hash) =>
-  bcrypt.compare(candidate, hash);
+userSchema.methods.checkPassword = (candidate, hash) => bcrypt.compare(candidate, hash);
 
 const User = model('Users', userSchema);
 

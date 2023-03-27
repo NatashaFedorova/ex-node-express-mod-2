@@ -26,10 +26,13 @@ exports.checkLoginData = catchAsync(async (req, res, next) => {
     req.headers.authorization?.startsWith('Bearer') &&
     req.headers.authorization.split(' ')[1];
 
-  if (!token) return next(new AppError(401, 'You are not logeed in'));
+  if (!token) return next(new AppError(401, 'You are not logged in'));
 
   const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
   const currentUser = await User.findById(decodedToken.id);
+
+  if (!currentUser)
+    return next(new AppError(401, 'You are not logged in'));
 
   req.user = currentUser;
 

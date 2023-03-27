@@ -14,10 +14,11 @@ exports.checkUserData = catchAsync(async (req, res, next) => {
 
   const userExists = await User.exists({ email });
 
-  if (userExists)
+  if (userExists) {
     return next(
       new AppError(409, 'User with this email already exists...')
     );
+  }
   req.body = value;
 
   next();
@@ -32,7 +33,6 @@ exports.checkUserId = catchAsync(async (req, res, next) => {
 
   const userExists = await User.exists({ _id: id });
 
-  if (!userExists)
-    return next(new AppError(409, 'User not found...'));
+  if (!userExists) return next(new AppError(409, 'User not found...'));
   next();
 });

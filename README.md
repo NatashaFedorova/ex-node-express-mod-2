@@ -22,3 +22,5 @@
 04
 
 1. bcrypt
+2. jsonwebtoken
+3. req.query (sort, pagination, search)

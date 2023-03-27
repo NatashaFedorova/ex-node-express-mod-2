@@ -5,10 +5,9 @@ const { catchAsync, AppError } = require('../utils');
 const { enums } = require('../constants');
 require('dotenv').config();
 
-const signToken = (id) =>
-  jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES,
-  });
+const signToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, {
+  expiresIn: process.env.JWT_EXPIRES,
+});
 
 exports.signup = catchAsync(async (req, res) => {
   const newUserData = {
@@ -39,8 +38,7 @@ exports.login = catchAsync(async (req, res, next) => {
     user.password
   );
 
-  if (!passwordIsValid)
-    return next(new AppError(401, 'Not authorized'));
+  if (!passwordIsValid) return next(new AppError(401, 'Not authorized'));
 
   user.password = undefined;
 

@@ -130,5 +130,4 @@ module.exports = {
       },
     },
   ],
-  'implicit-arrow-linebreak': ['error', 'below'],
 };

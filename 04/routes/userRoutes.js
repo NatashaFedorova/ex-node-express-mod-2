@@ -1,6 +1,7 @@
 const express = require('express');
 
 const {
+  getMe,
   createUser,
   getUsers,
   getUserById,
@@ -22,7 +23,11 @@ const {
 
 const router = express.Router();
 
+// user тає бути залогінений, щоб робити запити перераховані нижче  - ПОРЯДОК ВАЖЛИВИЙ
 router.use(checkLoginData);
+
+router.get('/me', getMe);
+
 router.use(
   allowFor(
     enums.USER_ROLES_ENUM.ADMIN,
