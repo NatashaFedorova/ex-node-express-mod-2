@@ -24,3 +24,7 @@
 1. bcrypt
 2. jsonwebtoken
 3. req.query (sort, pagination, search)
+
+05
+
+1. multer
