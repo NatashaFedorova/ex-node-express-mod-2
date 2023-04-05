@@ -28,3 +28,6 @@
 05
 
 1. multer
+2. fs-extra
+3. sharp
+4. crypto

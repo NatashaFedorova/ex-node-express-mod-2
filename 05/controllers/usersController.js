@@ -1,5 +1,7 @@
 const { catchAsync } = require('../utils');
 const User = require('../models/userModel');
+const ImageService = require('../services/imageServices');
+const { object } = require('joi');
 
 exports.getMe = (req, res) => {
   res.status(200).json({
@@ -8,10 +10,30 @@ exports.getMe = (req, res) => {
 };
 
 exports.updateMe = catchAsync(async (req, res) => {
-  const { user } = req;
+  const { user, file } = req;
 
-  res.status(200).json({ user });
+  if (file) {
+    user.avatar = await ImageService.save(
+      file,
+      { width: 300, height: 300 },
+      'images',
+      'users',
+      user.id
+    );
+  }
+
+  Object.keys(req.body).forEach((key) => {
+    user[key] = req.body[key];
+  });
+
+  const updatedUser = await user.save();
+
+  res.status(200).json({ user: updatedUser });
 });
+
+exports.updateMyPassword = (req, res) => {
+  res.status(200).json({ user: req.user });
+};
 
 exports.createUser = catchAsync(async (req, res) => {
   const { name, email, password, birthyear, role } = req.body;

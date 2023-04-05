@@ -1,9 +1,10 @@
 const {
   Types: { ObjectId },
 } = require('mongoose');
-const multer = require('multer');
-const { v4: uuidv4 } = require('uuid');
+const ImageService = require('../services/imageServices');
 const User = require('../models/userModel');
+
+const bcrypt = require('bcrypt');
 
 const { AppError, catchAsync, validators } = require('../utils');
 
@@ -37,25 +38,43 @@ exports.checkUserId = catchAsync(async (req, res, next) => {
   next();
 });
 
-const multerStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'static/img/users');
-  },
-  filename: (req, file, cb) => {
-    const ext = file.mimetype.split('/')[1];
-    cb(null, `${req.user.id}-${uuidv4()}.${ext}`);
-  },
-});
+// const multerStorage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, 'static/img/users');
+//   },
+//   filename: (req, file, cb) => {
+//     const ext = file.mimetype.split('/')[1];
+//     cb(null, `${req.user.id}-${uuidv4()}.${ext}`);
+//   },
+// });
 
-const multerFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image')) {
-    cb(null, true);
-  } else {
-    cb(new AppError(400, 'Please upload image only'), false);
+// const multerFilter = (req, file, cb) => {
+//   if (file.mimetype.startsWith('image')) {
+//     cb(null, true);
+//   } else {
+//     cb(new AppError(400, 'Please upload image only'), false);
+//   }
+// };
+
+// exports.uploadUserPhoto = multer({
+//   storage: multerStorage,
+//   fileFilter: multerFilter,
+// }).single('photo');
+
+exports.uploadUserPhoto = ImageService.upload('avatar');
+
+// додати  joi-валідацію
+exports.checkPassword = catchAsync(async (req, res, next) => {
+  const { currentPassword, newPassword } = req.body;
+  const user = await User.findById(req.user.id).select('password');
+
+  if (!(await user.checkPassword(currentPassword, user.password))) {
+    return next(new AppError(401, 'Current password is wrong'));
   }
-};
 
-exports.uploadUserPhoto = multer({
-  storage: multerStorage,
-  fileFilter: multerFilter,
-}).single('photo');
+  user.password = newPassword;
+
+  await user.save();
+
+  next();
+});

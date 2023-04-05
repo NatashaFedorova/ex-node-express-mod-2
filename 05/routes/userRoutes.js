@@ -3,6 +3,7 @@ const express = require('express');
 const {
   getMe,
   updateMe,
+  updateMyPassword,
   createUser,
   getUsers,
   getUserById,
@@ -13,6 +14,7 @@ const {
 const {
   checkUserData,
   checkUserId,
+  checkPassword,
   uploadUserPhoto,
 } = require('../middlewares/usersMiddlewares');
 
@@ -27,6 +29,7 @@ router.use(checkLoginData);
 
 router.get('/me', getMe);
 router.patch('/update-me', uploadUserPhoto, updateMe);
+router.patch('/update-my-password', checkPassword, updateMyPassword);
 
 router.use(
   allowFor(enums.USER_ROLES_ENUM.ADMIN, enums.USER_ROLES_ENUM.MODERATOR)
