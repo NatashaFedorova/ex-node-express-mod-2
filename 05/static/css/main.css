@@ -20,7 +20,7 @@ html {
   background-color: cornsilk;
 }
 
-.header__item-list {
+.header__list {
   display: flex;
   flex-direction: row;
   list-style-type: none;

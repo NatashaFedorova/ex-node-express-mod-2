@@ -1,19 +1,21 @@
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
-const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
-const { catchAsync, AppError } = require('../utils');
+const {
+  catchAsync,
+  AppError,
+  signToken,
+  userNameHeandler,
+} = require('../utils');
 const { enums } = require('../constants');
-require('dotenv').config();
-
-const signToken = (id) =>
-  jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES,
-  });
 
 exports.signup = catchAsync(async (req, res) => {
+  const { name, birthyear, email, password } = req.body;
   const newUserData = {
-    ...req.body,
+    name: userNameHeandler(name),
+    birthyear,
+    email,
+    password,
     role: enums.USER_ROLES_ENUM.USER,
   };
 

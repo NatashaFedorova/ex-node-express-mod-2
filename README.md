@@ -31,3 +31,7 @@
 2. fs-extra
 3. sharp
 4. crypto
+5. gravatar
+6. jest
+7. supertest
+8. pug
